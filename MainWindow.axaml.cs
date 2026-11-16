@@ -11,8 +11,9 @@ namespace GuiEventsLab;
 public partial class MainWindow : Window
 {
     private readonly CoffeeBar bar = new CoffeeBar();
+    private readonly Rewards rewards = new Rewards();
 
-    // Builds the window and subscribes to coffee bar events.
+    // Builds the window, connects listeners, and sets the initial buttons.
     public MainWindow()
     {
         InitializeComponent();
@@ -21,11 +22,13 @@ public partial class MainWindow : Window
         bar.OrderReady += Bar_OrderReady;
         bar.AllCaughtUp += Bar_AllCaughtUp;
 
-        // TODO: Part D, demo. Subscribe to TextChanged on both boxes,
-        // then set the buttons for an empty window.
+        CustomerBox.TextChanged += Boxes_TextChanged;
+        DrinkBox.TextChanged += Boxes_TextChanged;
 
-        // TODO: Exercise 4. Connect a Rewards object to the bar and
-        // subscribe to its FreeDrinkEarned event.
+        rewards.Connect(bar);
+        rewards.FreeDrinkEarned += Rewards_FreeDrinkEarned;
+
+        UpdateButtons();
     }
 
     // Places an order, clears successful input, or shows the refusal.
@@ -50,17 +53,19 @@ public partial class MainWindow : Window
         bar.FinishNext();
     }
 
-    // Refreshes the waiting list when an order is placed.
+    // Refreshes the waiting list and buttons when an order is placed.
     private void Bar_OrderPlaced(object? sender, OrderEventArgs e)
     {
         ShowWaiting();
+        UpdateButtons();
     }
 
-    // Adds the ready order to pickup and refreshes the waiting list.
+    // Shows the ready order and refreshes the waiting list and buttons.
     private void Bar_OrderReady(object? sender, OrderEventArgs e)
     {
         PickupList.Items.Add($"#{e.Order.Number} {e.Order.Customer}");
         ShowWaiting();
+        UpdateButtons();
     }
 
     // Shows a status message when the last waiting order is finished.
@@ -78,5 +83,25 @@ public partial class MainWindow : Window
         {
             WaitingList.Items.Add(order.ToString());
         }
+    }
+
+    // Updates the buttons whenever either input box changes.
+    private void Boxes_TextChanged(object? sender, TextChangedEventArgs e)
+    {
+        UpdateButtons();
+    }
+
+    // Enables each button only when its action can work.
+    private void UpdateButtons()
+    {
+        PlaceButton.IsEnabled = !string.IsNullOrWhiteSpace(CustomerBox.Text)
+                                && !string.IsNullOrWhiteSpace(DrinkBox.Text);
+        ReadyButton.IsEnabled = bar.WaitingCount > 0;
+    }
+
+    // Displays the customer who earned a free drink.
+    private void Rewards_FreeDrinkEarned(object? sender, OrderEventArgs e)
+    {
+        RewardText.Text = $"Free drink earned: {e.Order.Customer}";
     }
 }
