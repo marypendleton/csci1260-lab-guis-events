@@ -16,22 +16,21 @@ public class Buzzer
         return new List<string>(messages);
     }
 
+    // Subscribes OnOrderReady to the bar's OrderReady event.
     public void Connect(CoffeeBar bar)
     {
-        // TODO: Part B, demo
-        throw new NotImplementedException();
+        bar.OrderReady += OnOrderReady;
     }
 
-    // Unsubscribe with the same method that subscribed.
+    // Unsubscribes with the same method that subscribed.
     public void Disconnect(CoffeeBar bar)
     {
-        // TODO: Part B, demo
-        throw new NotImplementedException();
+        bar.OrderReady -= OnOrderReady;
     }
 
+    // Records a buzzer message whenever an order is ready.
     private void OnOrderReady(object? sender, OrderEventArgs e)
     {
-        // TODO: Part B, demo
-        throw new NotImplementedException();
+        messages.Add($"Buzz: {e.Order.Customer}, your {e.Order.Drink} is ready.");
     }
 }

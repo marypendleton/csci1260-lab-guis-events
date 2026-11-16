@@ -19,14 +19,21 @@ public class Rewards
         return drinks.GetValueOrDefault(customer);
     }
 
-    // Subscribe your handler to the bar's OrderReady event.
+    // Subscribe the handler to the bar's OrderReady event.
     public void Connect(CoffeeBar bar)
     {
-        // TODO: Exercise 2
-        throw new NotImplementedException();
+        bar.OrderReady += OnOrderReady;
     }
 
-    // TODO: Exercise 2. Write the handler here. Add one to the customer's
-    // count, and when the count reaches a multiple of DrinksPerReward,
-    // raise FreeDrinkEarned.
+    // Counts finished drinks and announces each earned free drink.
+    private void OnOrderReady(object? sender, OrderEventArgs e)
+    {
+        string name = e.Order.Customer;
+        drinks[name] = drinks.GetValueOrDefault(name) + 1;
+
+        if (drinks[name] % DrinksPerReward == 0)
+        {
+            FreeDrinkEarned?.Invoke(this, e);
+        }
+    }
 }
