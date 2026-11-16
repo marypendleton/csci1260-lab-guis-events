@@ -1,6 +1,6 @@
 # CSCI 1260 GUIs and Events Lab
 
-**Name:**
+**Name:** Mary Pendleton
 **Section:** 002
 **Language:** C#
 
