@@ -35,16 +35,30 @@ public class CoffeeBar
     // Build the order, put it in line, then announce it. Return the order.
     public Order Place(string customer, string drink)
     {
-        // TODO: Part A, demo
-        throw new NotImplementedException();
+        Order order = new Order(nextNumber, customer, drink);
+        nextNumber++;
+        waiting.Enqueue(order);
+        OrderPlaced?.Invoke(this, new OrderEventArgs(order));
+        return order;
     }
 
-    // Take the oldest order out of line, then announce it. Return the order.
+    // Finish the oldest order and announce when the line becomes empty.
     // Refuse with an InvalidOperationException when nothing is waiting.
     public Order FinishNext()
     {
-        // TODO: Part A, demo. Then Exercise 1: announce AllCaughtUp when
-        // the order you just finished was the last one in line.
-        throw new NotImplementedException();
+        if (waiting.Count == 0)
+        {
+            throw new InvalidOperationException("No orders are waiting.");
+        }
+
+        Order order = waiting.Dequeue();
+        OrderReady?.Invoke(this, new OrderEventArgs(order));
+
+        if (waiting.Count == 0)
+        {
+            AllCaughtUp?.Invoke(this, EventArgs.Empty);
+        }
+
+        return order;
     }
 }
